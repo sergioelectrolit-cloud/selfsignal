@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Как тебя видят другие</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://adsgram.ai/js/adsgram.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+  <div id="illustration"></div>
+  <h2 id="question"></h2>
+  <div id="options"></div>
+  <button id="nextBtn" disabled>Дальше</button>
+</div>
+
+<div id="result" class="hidden">
+  <h2>Твой профиль восприятия</h2>
+  <pre id="resultText"></pre>
+
+  <div class="locked">
+    <p><strong>Хочешь более глубокий разбор?</strong></p>
+    <p>Как ты влияешь на людей и где твоя скрытая сила.</p>
+    <button id="unlockBtn">Открыть полный разбор ▶</button>
+  </div>
+
+  <div id="extendedResult" class="hidden">
+    <h3>Расширенный разбор</h3>
+    <pre id="extendedText"></pre>
+  </div>
+
+  <button id="shareBtn">Поделиться результатом</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

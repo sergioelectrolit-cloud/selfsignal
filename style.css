@@ -1,0 +1,120 @@
+:root {
+  --bg: #0e0f13;
+  --card: #161821;
+  --accent: #5b8cff;
+  --text: #e6e8ee;
+  --muted: #9aa0b4;
+  --border: rgba(255,255,255,0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+  background: radial-gradient(1200px 800px at 50% -200px, #1a1d2b 0%, var(--bg) 60%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+#app, #result {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 22px 16px 32px;
+}
+
+.hidden {
+  display: none;
+}
+
+#illustration {
+  height: 90px;
+  border-radius: 18px;
+  margin-bottom: 18px;
+  transition: background 0.4s ease;
+}
+
+h2 {
+  font-size: 20px;
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+
+#options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#options button {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 14px 16px;
+  border-radius: 14px;
+  text-align: left;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#options button.active {
+  border-color: var(--accent);
+  background: rgba(91,140,255,0.15);
+}
+
+#nextBtn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #5b8cff, #7aa2ff);
+  color: #fff;
+}
+
+#nextBtn:disabled {
+  opacity: 0.4;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 18px;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.locked {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed rgba(255,255,255,0.15);
+  text-align: center;
+}
+
+#unlockBtn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 600;
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: #04210f;
+}
+
+#shareBtn {
+  margin-top: 24px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}

@@ -1,0 +1,114 @@
+{
+  "startValue": 50,
+  "questions": [
+    {
+      "text": "В компании ты чаще:",
+      "options": [
+        { "text": "Слушаешь и киваешь", "effects": { "expressiveness": -10, "influence": -5 } },
+        { "text": "Включаешься по делу", "effects": { "expressiveness": -5, "influence": 0 } },
+        { "text": "Часто задаёшь тон", "effects": { "expressiveness": 5, "influence": 5 } },
+        { "text": "Становишься центром внимания", "effects": { "expressiveness": 10, "influence": 10 } }
+      ]
+    },
+    {
+      "text": "Если разговор накаляется, ты:",
+      "options": [
+        { "text": "Замыкаешься", "effects": { "control": -10, "warmth": -5 } },
+        { "text": "Сглаживаешь углы", "effects": { "control": 5, "warmth": 10 } },
+        { "text": "Спокойно держишь позицию", "effects": { "control": 10, "warmth": 5 } },
+        { "text": "Давишь, чтобы решить быстрее", "effects": { "control": 10, "warmth": -10 } }
+      ]
+    },
+    {
+      "text": "Когда объясняешь идею:",
+      "options": [
+        { "text": "Тебя часто не понимают", "effects": { "clarity": -10, "control": -5 } },
+        { "text": "Понимают после уточнений", "effects": { "clarity": -5, "control": 0 } },
+        { "text": "Обычно всё ясно", "effects": { "clarity": 5, "control": 5 } },
+        { "text": "Вопросов почти нет", "effects": { "clarity": 10, "control": 10 } }
+      ]
+    },
+    {
+      "text": "При первом знакомстве ты кажешься:",
+      "options": [
+        { "text": "Закрытым", "effects": { "warmth": -10, "expressiveness": -5 } },
+        { "text": "Нейтральным", "effects": { } },
+        { "text": "Приятным", "effects": { "warmth": 5, "expressiveness": 5 } },
+        { "text": "Сразу располагающим", "effects": { "warmth": 10, "expressiveness": 10 } }
+      ]
+    },
+    {
+      "text": "Когда ты предлагаешь решение:",
+      "options": [
+        { "text": "Его редко поддерживают", "effects": { "influence": -10, "clarity": -5 } },
+        { "text": "Поддерживают не сразу", "effects": { "influence": -5 } },
+        { "text": "Часто соглашаются", "effects": { "influence": 5, "clarity": 5 } },
+        { "text": "Обычно идут за тобой", "effects": { "influence": 10, "clarity": 10 } }
+      ]
+    },
+    {
+      "text": "Твой стиль действий:",
+      "options": [
+        { "text": "Импульсивный", "effects": { "control": -10, "expressiveness": 5 } },
+        { "text": "Зависит от ситуации", "effects": { } },
+        { "text": "Достаточно собранный", "effects": { "control": 5, "expressiveness": -5 } },
+        { "text": "Чёткий и продуманный", "effects": { "control": 10, "expressiveness": -10 } }
+      ]
+    },
+    {
+      "text": "Люди рядом с тобой чаще чувствуют:",
+      "options": [
+        { "text": "Напряжение", "effects": { "warmth": -10, "influence": -5 } },
+        { "text": "Нейтрал", "effects": { } },
+        { "text": "Комфорт", "effects": { "warmth": 5, "influence": 5 } },
+        { "text": "Подъём и мотивацию", "effects": { "warmth": 10, "influence": 10 } }
+      ]
+    },
+    {
+      "text": "Твои эмоции для других:",
+      "options": [
+        { "text": "Загадка", "effects": { "clarity": -10, "expressiveness": -5 } },
+        { "text": "Иногда понятны", "effects": { "clarity": -5 } },
+        { "text": "Обычно читаемы", "effects": { "clarity": 5, "expressiveness": 5 } },
+        { "text": "Видны сразу", "effects": { "clarity": 10, "expressiveness": 10 } }
+      ]
+    },
+    {
+      "text": "В принятии решений ты:",
+      "options": [
+        { "text": "Подстраиваешься", "effects": { "influence": -10, "control": -5 } },
+        { "text": "Участвуешь", "effects": { "influence": -5 } },
+        { "text": "Часто направляешь", "effects": { "influence": 5, "control": 5 } },
+        { "text": "Берёшь ответственность", "effects": { "influence": 10, "control": 10 } }
+      ]
+    },
+    {
+      "text": "Обратная связь от людей:",
+      "options": [
+        { "text": "«Тебя сложно понять»", "effects": { "clarity": -10, "warmth": -5 } },
+        { "text": "«Норм, но сухо»", "effects": { "clarity": -5 } },
+        { "text": "«С тобой легко»", "effects": { "clarity": 5, "warmth": 5 } },
+        { "text": "«С тобой приятно и понятно»", "effects": { "clarity": 10, "warmth": 10 } }
+      ]
+    },
+    {
+      "text": "В группе ты чаще:",
+      "options": [
+        { "text": "Фон", "effects": { "expressiveness": -10, "influence": -5 } },
+        { "text": "Участник", "effects": { "expressiveness": -5 } },
+        { "text": "Инициатор", "effects": { "expressiveness": 5, "influence": 5 } },
+        { "text": "Драйвер", "effects": { "expressiveness": 10, "influence": 10 } }
+      ]
+    },
+    {
+      "text": "В стрессовой ситуации ты:",
+      "options": [
+        { "text": "Теряешься", "effects": { "control": -10, "warmth": -5 } },
+        { "text": "Держишься", "effects": { } },
+        { "text": "Успокаиваешь других", "effects": { "control": 5, "warmth": 10 } },
+        { "text": "Берёшь всё под контроль", "effects": { "control": 10, "warmth": -5 } }
+      ]
+    }
+  ]
+}
+
