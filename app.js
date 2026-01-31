@@ -9,7 +9,7 @@ tg.expand();
  * BACKEND (RENDER)
  * ⬇️ ПОТОМ ВСТАВИШЬ СВОЙ URL
  *********************************/
-const BACKEND_URL = "https://YOUR-RENDER-APP.onrender.com";
+const BACKEND_URL = "https://selfsignal.onrender.com";
 
 /*********************************
  * CONFIG
