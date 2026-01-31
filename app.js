@@ -6,14 +6,9 @@ tg.ready();
 tg.expand();
 
 /*********************************
- * BACKEND (RENDER)
- * ⬇️ ПОТОМ ВСТАВИШЬ СВОЙ URL
+ * CONFIG & STATE
  *********************************/
 const BACKEND_URL = "https://selfsignal.onrender.com";
-
-/*********************************
- * CONFIG
- *********************************/
 const AVERAGE = 50;
 
 let data;
@@ -66,10 +61,7 @@ fetch("questions.json")
  *********************************/
 function render() {
   const q = data.questions[current];
-
-  document.getElementById("illustration").style.background =
-    visuals[q.visual];
-
+  document.getElementById("illustration").style.background = visuals[q.visual] || "#333";
   document.getElementById("question").innerText = q.text;
 
   const options = document.getElementById("options");
@@ -80,17 +72,12 @@ function render() {
   q.options.forEach(opt => {
     const btn = document.createElement("button");
     btn.innerText = opt.text;
-
     btn.onclick = () => {
-      document
-        .querySelectorAll("#options button")
-        .forEach(b => b.classList.remove("active"));
-
+      document.querySelectorAll("#options button").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       selected = opt.effects;
       document.getElementById("nextBtn").disabled = false;
     };
-
     options.appendChild(btn);
   });
 }
@@ -102,14 +89,10 @@ document.getElementById("nextBtn").onclick = () => {
   for (let k in selected) {
     state[k] = Math.max(0, Math.min(100, state[k] + selected[k]));
   }
-
   current++;
   current < data.questions.length ? render() : showResult();
 };
 
-/*********************************
- * RESULT TEXT HELPERS
- *********************************/
 function diffText(value, high, low) {
   const d = value - AVERAGE;
   if (d > 0) return `на ${d}% ${high} среднего`;
@@ -137,10 +120,7 @@ function showResult() {
 
   document.getElementById("resultText").innerText = text;
 
-  // 🔔 УВЕДОМЛЕНИЕ В TELEGRAM (RENDER)
-  notifyBackend(
-    `🧠 Пользователь прошёл тест\n\n${text}`
-  );
+  notifyBackend(`🧠 Пользователь прошёл тест\n\n${text}`);
 
   document.getElementById("shareBtn").onclick = () => {
     tg.shareText(`Мой профиль восприятия 👀\n\n${text}`);
@@ -150,19 +130,31 @@ function showResult() {
 }
 
 /*********************************
- * ADSGRAM
+ * ADSGRAM LOGIC
  *********************************/
 function showAd() {
-  const ad = new Adsgram({
-    blockId: "YOUR_ADSGRAM_BLOCK_ID",
-    onReward: unlockExtended
+  // Получаем ID пользователя из TG
+  const userId = tg.initDataUnsafe?.user?.id || "unknown";
+
+  // Инициализируем Adsgram
+  const ad = window.Adsgram.init({
+    blockId: "29169d6338f2416594c7ecc0ca3d8298", // ЗАМЕНИ НА СВОЙ ID БЛОКА
+    userId: userId.toString(),       // Передаем ID для Reward URL
+    debug: false 
   });
-  ad.show();
+
+  ad.show()
+    .then(() => {
+      // Пользователь досмотрел рекламу
+      unlockExtended();
+      notifyBackend(`✅ Реклама досмотрена (User: ${userId})`);
+    })
+    .catch((error) => {
+      console.error("Ad error or skip:", error);
+      alert("Чтобы увидеть разбор, нужно досмотреть рекламу до конца.");
+    });
 }
 
-/*********************************
- * EXTENDED RESULT
- *********************************/
 function unlockExtended() {
   document.querySelector(".locked").classList.add("hidden");
   document.getElementById("extendedResult").classList.remove("hidden");
@@ -177,7 +169,4 @@ function unlockExtended() {
 
 Совет: не ускоряйся. Твоя сила — в точности.
   `.trim();
-
-  // 🔔 ЛОГ РАЗБЛОКИРОВКИ
-  notifyBackend("🔓 Пользователь открыл расширенный результат");
 }
