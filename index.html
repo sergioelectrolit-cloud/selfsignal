@@ -2,46 +2,41 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
+    <!-- Запрет кэширования, чтобы Telegram всегда качал свежий код -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>Как тебя видят другие</title>
+    <title>Тест восприятия</title>
     
-    <!-- Подключаем Telegram SDK сразу -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Adsgram попробуем загрузить здесь, но в app.js сделаем страховку -->
-    <script src="https://adsgram.ai/js/adsgram.min.js"></script>
-    
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div id="app">
     <div id="illustration"></div>
-    <h2 id="question"></h2>
+    <h2 id="question">Загрузка...</h2>
     <div id="options"></div>
     <button id="nextBtn" disabled>Дальше</button>
 </div>
 
 <div id="result" class="hidden">
-    <h2>Твой профиль восприятия</h2>
+    <h2>Твой профиль</h2>
     <pre id="resultText"></pre>
 
     <div class="locked">
-        <p><strong>Хочешь более глубокий разбор?</strong></p>
-        <p>Как ты влияешь на людей и где твоя скрытая сила.</p>
-        <button id="unlockBtn">Открыть полный разбор ▶</button>
+        <p><strong>Хочешь полный разбор?</strong></p>
+        <button id="unlockBtn">Открыть разбор (Реклама) ▶</button>
     </div>
 
     <div id="extendedResult" class="hidden">
-        <h3>Расширенный разбор</h3>
+        <h3>Глубокий анализ</h3>
         <pre id="extendedText"></pre>
     </div>
 
-    <button id="shareBtn">Поделиться результатом</button>
+    <button id="shareBtn">Поделиться</button>
 </div>
 
+<!-- Только один скрипт, остальное загрузим внутри него -->
 <script src="app.js"></script>
 </body>
 </html>
