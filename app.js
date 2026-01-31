@@ -1,42 +1,50 @@
 /*********************************
- * ADSGRAM AUTO-LOADER & FIX
+ * 1. ОТЛАДКА (Eruda)
+ *********************************/
+// Позволяет видеть консоль прямо в Telegram
+(function () {
+    const script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/eruda";
+    document.head.appendChild(script);
+    script.onload = () => eruda.init();
+})();
+
+/*********************************
+ * 2. ЗАГРУЗЧИК ADSGRAM
  *********************************/
 function loadAdsgram() {
     return new Promise((resolve, reject) => {
-        if (window.Adsgram) {
-            resolve(window.Adsgram);
-            return;
-        }
-        console.log("Adsgram не найден, загружаем принудительно...");
+        if (window.Adsgram) return resolve(window.Adsgram);
+        
         const script = document.createElement('script');
-        script.src = "https://adsgram.ai/js/adsgram.min.js";
+        script.src = "https://adsgram.ai/js/adsgram.min.js?v=" + Date.now(); // Добавляем метку времени от кэша
+        script.async = true;
+        
         script.onload = () => {
-            console.log("Adsgram загружен успешно!");
+            console.log("✅ Adsgram SDK загружен");
             resolve(window.Adsgram);
         };
-        script.onerror = () => reject(new Error("Не удалось загрузить скрипт Adsgram. Проверьте интернет или настройки провайдера."));
+        
+        script.onerror = () => {
+            console.error("❌ Ошибка загрузки Adsgram SDK");
+            reject(new Error("Не удалось загрузить рекламный модуль. Проверьте интернет или VPN."));
+        };
+        
         document.head.appendChild(script);
     });
 }
 
-// Запускаем загрузку сразу
-loadAdsgram().catch(err => console.error(err));
+// Запускаем загрузку заранее
+loadAdsgram().catch(() => {});
+
 /*********************************
- * TELEGRAM WEB APP INIT
+ * 3. ОСНОВНАЯ ЛОГИКА ТЕСТА
  *********************************/
 const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-// Добавляем консоль отладки для Telegram (потом удалишь)
-const script = document.createElement('script');
-script.src = "//cdn.jsdelivr.net/npm/eruda";
-document.head.appendChild(script);
-script.onload = () => eruda.init();
-
 const BACKEND_URL = "https://selfsignal.onrender.com";
-const AVERAGE = 50;
-
 let data, current = 0, selected = null;
 let state = { expressiveness: 50, control: 50, clarity: 50, warmth: 50, influence: 50 };
 
@@ -55,13 +63,13 @@ async function notifyBackend(text) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text })
         });
-    } catch (e) { console.error("Render error:", e); }
+    } catch (e) { console.error("Notify error:", e); }
 }
 
 fetch("questions.json").then(r => r.json()).then(json => {
     data = json;
     render();
-});
+}).catch(e => alert("Ошибка загрузки вопросов: " + e.message));
 
 function render() {
     const q = data.questions[current];
@@ -91,40 +99,30 @@ document.getElementById("nextBtn").onclick = () => {
     current < data.questions.length ? render() : showResult();
 };
 
-function diffText(value, high, low) {
-    const d = value - AVERAGE;
-    if (d > 0) return `на ${d}% ${high} среднего`;
-    if (d < 0) return `на ${Math.abs(d)}% ${low} среднего`;
-    return "примерно как у большинства";
-}
-
 function showResult() {
     document.getElementById("app").classList.add("hidden");
     document.getElementById("result").classList.remove("hidden");
-    const text = `— Выраженность: ${diffText(state.expressiveness,"ярче","менее заметен, чем")}\n— Контроль: ${diffText(state.control,"спокойнее","менее собран, чем")}\n— Читаемость: ${diffText(state.clarity,"понятнее","сложнее понять, чем")}\n— Теплота: ${diffText(state.warmth,"теплее","холоднее, чем")}\n— Влияние: ${diffText(state.influence,"влияешь сильнее","влияешь слабее, чем")}`;
-    document.getElementById("resultText").innerText = text;
-    notifyBackend(`🧠 Пользователь прошёл тест\n\n${text}`);
-    document.getElementById("shareBtn").onclick = () => tg.shareText(text);
+    const resText = `Профиль: Экспрессия ${state.expressiveness}%, Контроль ${state.control}%...`;
+    document.getElementById("resultText").innerText = resText;
     
-    // ПРИВЯЗКА КНОПКИ РЕКЛАМЫ
-    const unlockBtn = document.getElementById("unlockBtn");
-    unlockBtn.onclick = () => {
-        console.log("Клик по кнопке разблокировки");
-        showAd();
-    };
+    notifyBackend(`🧠 Тест пройден\n${resText}`);
+    
+    document.getElementById("unlockBtn").onclick = showAd;
+    document.getElementById("shareBtn").onclick = () => tg.shareText(resText);
 }
 
 /*********************************
- * ADSGRAM + DEBUG
+ * 4. РАБОТА С РЕКЛАМОЙ (ADSGRAM)
  *********************************/
 async function showAd() {
-    console.log("Нажата кнопка рекламы");
-    
+    const btn = document.getElementById("unlockBtn");
+    btn.innerText = "Загрузка...";
+    btn.disabled = true;
+
     try {
-        // Ждем загрузки SDK, если он еще не готов
         const AdsgramSDK = await loadAdsgram();
-        
         const userId = tg.initDataUnsafe?.user?.id?.toString() || "unknown";
+        
         const ad = AdsgramSDK.init({
             blockId: "29169d6338f2416594c7ecc0ca3d8298",
             userId: userId,
@@ -134,26 +132,33 @@ async function showAd() {
         ad.show()
             .then(() => {
                 unlockExtended();
-                notifyBackend(`✅ Реклама досмотрена (User: ${userId})`);
+                notifyBackend(`✅ Реклама досмотрена: ${userId}`);
             })
             .catch((err) => {
-                console.error("Ошибка показа:", err);
+                console.warn("Реклама не показана:", err);
                 if (err.error === "no_ads") {
-                    alert("Рекламы пока нет, открываю результат бесплатно.");
+                    alert("Реклама закончилась. Открываем результат бесплатно.");
                     unlockExtended();
                 } else {
-                    alert("Для получения бонуса нужно досмотреть видео.");
+                    alert("Нужно досмотреть видео до конца.");
+                    btn.innerText = "Открыть разбор (Реклама) ▶";
+                    btn.disabled = false;
                 }
             });
             
     } catch (e) {
-        console.error(e);
-        alert("Ошибка: " + e.message);
+        console.error("SDK Error:", e);
+        alert("Не удалось загрузить рекламу. Возможно, она заблокирована в вашей сети.");
+        // В случае ошибки SDK — даем пользователю шанс пройти дальше, чтобы не портить опыт
+        btn.innerText = "Ошибка загрузки (Нажми еще раз)";
+        btn.disabled = false;
+        // Можно раскомментировать строку ниже, чтобы пускать бесплатно при ошибке:
+        // unlockExtended();
     }
 }
 
 function unlockExtended() {
     document.querySelector(".locked").classList.add("hidden");
     document.getElementById("extendedResult").classList.remove("hidden");
-    document.getElementById("extendedText").innerText = "Ты производишь эффект спокойной уверенности...";
+    document.getElementById("extendedText").innerText = "Ты обладаешь редким сочетанием качеств...";
 }
