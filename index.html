@@ -2,11 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <!-- Запрет кэширования, чтобы Telegram всегда качал свежий код -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>Тест восприятия</title>
-    
+    <title>Тест 3.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css" />
 </head>
@@ -20,23 +17,17 @@
 </div>
 
 <div id="result" class="hidden">
-    <h2>Твой профиль</h2>
+    <h2>Твой результат</h2>
     <pre id="resultText"></pre>
-
     <div class="locked">
-        <p><strong>Хочешь полный разбор?</strong></p>
-        <button id="unlockBtn">Открыть разбор (Реклама) ▶</button>
+        <button id="unlockBtn" style="background: orange; color: black; padding: 20px;">ОТКРЫТЬ РАЗБОР (РЕКЛАМА)</button>
     </div>
-
     <div id="extendedResult" class="hidden">
-        <h3>Глубокий анализ</h3>
         <pre id="extendedText"></pre>
     </div>
-
-    <button id="shareBtn">Поделиться</button>
 </div>
 
-<!-- Только один скрипт, остальное загрузим внутри него -->
-<script src="app.js"></script>
+<!-- Добавляем ?v=1 к названию, чтобы сбросить кэш -->
+<script src="app.js?v=1.0.3"></script>
 </body>
 </html>
