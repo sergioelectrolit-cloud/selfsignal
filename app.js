@@ -1,164 +1,89 @@
-/*********************************
- * 1. ОТЛАДКА (Eruda)
- *********************************/
-// Позволяет видеть консоль прямо в Telegram
-(function () {
-    const script = document.createElement('script');
-    script.src = "https://cdn.jsdelivr.net/npm/eruda";
-    document.head.appendChild(script);
-    script.onload = () => eruda.init();
-})();
+// 1. Проверка запуска
+alert("Код 3.0 запущен!");
 
-/*********************************
- * 2. ЗАГРУЗЧИК ADSGRAM
- *********************************/
-function loadAdsgram() {
+const tg = window.Telegram.WebApp;
+tg.ready();
+
+const BACKEND_URL = "https://selfsignal.onrender.com";
+
+// 2. Функция загрузки рекламы
+async function loadAdsgram() {
     return new Promise((resolve, reject) => {
         if (window.Adsgram) return resolve(window.Adsgram);
         
+        console.log("Пытаюсь скачать Adsgram SDK...");
         const script = document.createElement('script');
-        script.src = "https://adsgram.ai/js/adsgram.min.js?v=" + Date.now(); // Добавляем метку времени от кэша
-        script.async = true;
+        script.src = "https://adsgram.ai/js/adsgram.min.js";
         
         script.onload = () => {
-            console.log("✅ Adsgram SDK загружен");
+            alert("Adsgram SDK успешно скачан!");
             resolve(window.Adsgram);
         };
         
         script.onerror = () => {
-            console.error("❌ Ошибка загрузки Adsgram SDK");
-            reject(new Error("Не удалось загрузить рекламный модуль. Проверьте интернет или VPN."));
+            alert("ОШИБКА: Не удалось скачать файл Adsgram с сервера adsgram.ai");
+            reject();
         };
         
         document.head.appendChild(script);
     });
 }
 
-// Запускаем загрузку заранее
-loadAdsgram().catch(() => {});
+// Запускаем загрузку сразу
+loadAdsgram();
 
-/*********************************
- * 3. ОСНОВНАЯ ЛОГИКА ТЕСТА
- *********************************/
-const tg = window.Telegram.WebApp;
-tg.ready();
-tg.expand();
+// 3. Загрузка вопросов
+fetch("questions.json")
+    .then(r => r.json())
+    .then(json => {
+        alert("Вопросы загружены!");
+        window.quizData = json;
+        initQuiz();
+    })
+    .catch(e => alert("Ошибка загрузки JSON: " + e.message));
 
-const BACKEND_URL = "https://selfsignal.onrender.com";
-let data, current = 0, selected = null;
-let state = { expressiveness: 50, control: 50, clarity: 50, warmth: 50, influence: 50 };
-
-const visuals = {
-    expressiveness: "linear-gradient(135deg,#4c1d95,#2e1065)",
-    control: "linear-gradient(135deg,#1e293b,#0f172a)",
-    clarity: "linear-gradient(135deg,#064e3b,#022c22)",
-    warmth: "linear-gradient(135deg,#3f1d2b,#1f0f14)",
-    influence: "linear-gradient(135deg,#312e81,#1e1b4b)"
-};
-
-async function notifyBackend(text) {
-    try {
-        await fetch(`${BACKEND_URL}/notify`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
-        });
-    } catch (e) { console.error("Notify error:", e); }
+function initQuiz() {
+    // Упрощенная логика для теста кнопки
+    document.getElementById("question").innerText = "Нажми 'Дальше', чтобы дойти до рекламы";
+    document.getElementById("nextBtn").disabled = false;
+    document.getElementById("nextBtn").onclick = () => {
+        document.getElementById("app").classList.add("hidden");
+        document.getElementById("result").classList.remove("hidden");
+        document.getElementById("resultText").innerText = "Тест завершен. Нажми кнопку ниже.";
+    };
 }
 
-fetch("questions.json").then(r => r.json()).then(json => {
-    data = json;
-    render();
-}).catch(e => alert("Ошибка загрузки вопросов: " + e.message));
+// 4. ГЛАВНАЯ ФУНКЦИЯ КНОПКИ
+document.getElementById("unlockBtn").onclick = async function() {
+    alert("Кнопка нажата! Начинаю инициализацию рекламы...");
 
-function render() {
-    const q = data.questions[current];
-    document.getElementById("illustration").style.background = visuals[q.visual] || "#333";
-    document.getElementById("question").innerText = q.text;
-    const options = document.getElementById("options");
-    options.innerHTML = "";
-    selected = null;
-    document.getElementById("nextBtn").disabled = true;
-
-    q.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.innerText = opt.text;
-        btn.onclick = () => {
-            document.querySelectorAll("#options button").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            selected = opt.effects;
-            document.getElementById("nextBtn").disabled = false;
-        };
-        options.appendChild(btn);
-    });
-}
-
-document.getElementById("nextBtn").onclick = () => {
-    for (let k in selected) state[k] = Math.max(0, Math.min(100, state[k] + selected[k]));
-    current++;
-    current < data.questions.length ? render() : showResult();
-};
-
-function showResult() {
-    document.getElementById("app").classList.add("hidden");
-    document.getElementById("result").classList.remove("hidden");
-    const resText = `Профиль: Экспрессия ${state.expressiveness}%, Контроль ${state.control}%...`;
-    document.getElementById("resultText").innerText = resText;
-    
-    notifyBackend(`🧠 Тест пройден\n${resText}`);
-    
-    document.getElementById("unlockBtn").onclick = showAd;
-    document.getElementById("shareBtn").onclick = () => tg.shareText(resText);
-}
-
-/*********************************
- * 4. РАБОТА С РЕКЛАМОЙ (ADSGRAM)
- *********************************/
-async function showAd() {
-    const btn = document.getElementById("unlockBtn");
-    btn.innerText = "Загрузка...";
-    btn.disabled = true;
+    if (!window.Adsgram) {
+        alert("Ошибка: Объект window.Adsgram всё еще пуст. Реклама не загрузится.");
+        return;
+    }
 
     try {
-        const AdsgramSDK = await loadAdsgram();
-        const userId = tg.initDataUnsafe?.user?.id?.toString() || "unknown";
+        const userId = tg.initDataUnsafe?.user?.id?.toString() || "12345";
         
-        const ad = AdsgramSDK.init({
-            blockId: "29169d6338f2416594c7ecc0ca3d8298",
+        const ad = window.Adsgram.init({
+            blockId: "29169d6338f2416594c7ecc0ca3d8298", // Твой ID
             userId: userId,
             debug: true 
         });
 
+        alert("Adsgram инициализирован. Вызываю ad.show()...");
+
         ad.show()
             .then(() => {
-                unlockExtended();
-                notifyBackend(`✅ Реклама досмотрена: ${userId}`);
+                alert("УРА! Реклама досмотрена!");
+                document.getElementById("extendedResult").classList.remove("hidden");
+                document.getElementById("extendedText").innerText = "Твой расширенный результат готов!";
             })
             .catch((err) => {
-                console.warn("Реклама не показана:", err);
-                if (err.error === "no_ads") {
-                    alert("Реклама закончилась. Открываем результат бесплатно.");
-                    unlockExtended();
-                } else {
-                    alert("Нужно досмотреть видео до конца.");
-                    btn.innerText = "Открыть разбор (Реклама) ▶";
-                    btn.disabled = false;
-                }
+                alert("Adsgram вернул отказ: " + JSON.stringify(err));
             });
-            
-    } catch (e) {
-        console.error("SDK Error:", e);
-        alert("Не удалось загрузить рекламу. Возможно, она заблокирована в вашей сети.");
-        // В случае ошибки SDK — даем пользователю шанс пройти дальше, чтобы не портить опыт
-        btn.innerText = "Ошибка загрузки (Нажми еще раз)";
-        btn.disabled = false;
-        // Можно раскомментировать строку ниже, чтобы пускать бесплатно при ошибке:
-        // unlockExtended();
-    }
-}
 
-function unlockExtended() {
-    document.querySelector(".locked").classList.add("hidden");
-    document.getElementById("extendedResult").classList.remove("hidden");
-    document.getElementById("extendedText").innerText = "Ты обладаешь редким сочетанием качеств...";
-}
+    } catch (e) {
+        alert("Фатальная ошибка в коде: " + e.message);
+    }
+};
