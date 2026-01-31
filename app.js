@@ -133,25 +133,34 @@ function showResult() {
  * ADSGRAM LOGIC
  *********************************/
 function showAd() {
-  // Получаем ID пользователя из TG
   const userId = tg.initDataUnsafe?.user?.id || "unknown";
 
-  // Инициализируем Adsgram
+  // ПРОВЕРКА: загрузился ли скрипт Adsgram
+  if (!window.Adsgram) {
+    console.error("Adsgram script is not loaded. Check AdBlock.");
+    alert("Рекламный модуль не загружен. Если у вас включен AdBlock — отключите его для корректной работы теста.");
+    return;
+  }
+
   const ad = window.Adsgram.init({
-    blockId: "29169d6338f2416594c7ecc0ca3d8298", // ЗАМЕНИ НА СВОЙ ID БЛОКА
-    userId: userId.toString(),       // Передаем ID для Reward URL
+    blockId: "29169d6338f2416594c7ecc0ca3d8298",
+    userId: userId.toString(),
     debug: false 
   });
 
   ad.show()
     .then(() => {
-      // Пользователь досмотрел рекламу
       unlockExtended();
       notifyBackend(`✅ Реклама досмотрена (User: ${userId})`);
     })
     .catch((error) => {
-      console.error("Ad error or skip:", error);
-      alert("Чтобы увидеть разбор, нужно досмотреть рекламу до конца.");
+      console.error("Ad error:", error);
+      // Если реклама просто не нашлась (no_ads), можно все равно открыть результат
+      if (error.error === "no_ads") {
+         unlockExtended(); 
+      } else {
+         alert("Чтобы увидеть разбор, нужно досмотреть рекламу до конца.");
+      }
     });
 }
 
