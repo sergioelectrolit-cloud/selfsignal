@@ -25,3 +25,16 @@ app.post("/notify", async (req, res) => {
 });
 
 app.listen(3000);
+app.post('/adsgram/reward', (req, res) => {
+  try {
+    // Тут можно проверить подпись Adsgram (если дают)
+    console.log('Adsgram reward:', req.body);
+
+    // Можно логировать, считать, сохранять
+    // Можно отправить себе уведомление в TG
+
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false });
+  }
+});
