@@ -66,7 +66,7 @@ document.getElementById("unlockBtn").onclick = async function() {
         const userId = tg.initDataUnsafe?.user?.id?.toString() || "12345";
         
         const ad = window.Adsgram.init({
-            blockId: "29169d6338f2416594c7ecc0ca3d8298", // Твой ID
+            blockId: "22095", // Твой ID
             userId: userId,
             debug: true 
         });
