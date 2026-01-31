@@ -1,4 +1,27 @@
 /*********************************
+ * ADSGRAM AUTO-LOADER & FIX
+ *********************************/
+function loadAdsgram() {
+    return new Promise((resolve, reject) => {
+        if (window.Adsgram) {
+            resolve(window.Adsgram);
+            return;
+        }
+        console.log("Adsgram не найден, загружаем принудительно...");
+        const script = document.createElement('script');
+        script.src = "https://adsgram.ai/js/adsgram.min.js";
+        script.onload = () => {
+            console.log("Adsgram загружен успешно!");
+            resolve(window.Adsgram);
+        };
+        script.onerror = () => reject(new Error("Не удалось загрузить скрипт Adsgram. Проверьте интернет или настройки провайдера."));
+        document.head.appendChild(script);
+    });
+}
+
+// Запускаем загрузку сразу
+loadAdsgram().catch(err => console.error(err));
+/*********************************
  * TELEGRAM WEB APP INIT
  *********************************/
 const tg = window.Telegram.WebApp;
@@ -94,42 +117,38 @@ function showResult() {
 /*********************************
  * ADSGRAM + DEBUG
  *********************************/
-function showAd() {
-    console.log("Функция showAd запущена");
-
-    if (!window.Adsgram) {
-        alert("Критическая ошибка: Adsgram SDK не загружен. Проверьте соединение или AdBlock.");
-        return;
-    }
-
-    const userId = tg.initDataUnsafe?.user?.id?.toString() || "unknown_id";
-    console.log("Инициализация Adsgram для ID:", userId);
-
+async function showAd() {
+    console.log("Нажата кнопка рекламы");
+    
     try {
-        const ad = window.Adsgram.init({
+        // Ждем загрузки SDK, если он еще не готов
+        const AdsgramSDK = await loadAdsgram();
+        
+        const userId = tg.initDataUnsafe?.user?.id?.toString() || "unknown";
+        const ad = AdsgramSDK.init({
             blockId: "29169d6338f2416594c7ecc0ca3d8298",
             userId: userId,
-            debug: true // ВКЛЮЧАЕМ ДЛЯ ТЕСТОВ
+            debug: true 
         });
 
         ad.show()
-            .then((res) => {
-                console.log("Реклама показана успешно", res);
+            .then(() => {
                 unlockExtended();
                 notifyBackend(`✅ Реклама досмотрена (User: ${userId})`);
             })
             .catch((err) => {
-                console.error("Ошибка в промисе ad.show:", err);
+                console.error("Ошибка показа:", err);
                 if (err.error === "no_ads") {
-                    alert("Рекламы пока нет, открываю результат так.");
+                    alert("Рекламы пока нет, открываю результат бесплатно.");
                     unlockExtended();
                 } else {
-                    alert("Нужно досмотреть видео до конца: " + (err.description || "ошибка"));
+                    alert("Для получения бонуса нужно досмотреть видео.");
                 }
             });
+            
     } catch (e) {
-        console.error("Фатальная ошибка инициализации Adsgram:", e);
-        alert("Ошибка инициализации: " + e.message);
+        console.error(e);
+        alert("Ошибка: " + e.message);
     }
 }
 
