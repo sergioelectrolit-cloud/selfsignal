@@ -1,40 +1,65 @@
-// 1. Проверка запуска
-alert("Код 3.0 запущен!");
-
 const tg = window.Telegram.WebApp;
 tg.ready();
 
 const BACKEND_URL = "https://selfsignal.onrender.com";
 
-// 2. Функция загрузки рекламы
+// Функция загрузки SDK
 async function loadAdsgram() {
     return new Promise((resolve, reject) => {
         if (window.Adsgram) return resolve(window.Adsgram);
         
-        console.log("Пытаюсь скачать Adsgram SDK...");
         const script = document.createElement('script');
-        script.src = "https://adsgram.ai/js/adsgram.min.js";
-        
-        script.onload = () => {
-            alert("Adsgram SDK успешно скачан!");
-            resolve(window.Adsgram);
-        };
-        
-        script.onerror = () => {
-            alert("ОШИБКА: Не удалось скачать файл Adsgram с сервера adsgram.ai");
-            reject();
-        };
-        
+        script.src = "https://static.adsgram.ai/js/adsgram-sdk.js"; // Обновленный URL
+        script.onload = () => resolve(window.Adsgram);
+        script.onerror = () => reject(new Error("Не удалось загрузить SDK"));
         document.head.appendChild(script);
     });
 }
 
-// Запускаем загрузку сразу
-loadAdsgram();
+// Глобальная переменная для рекламного контроллера
+let adController = null;
 
-// 3. Загрузка вопросов
-fetch("questions.json")
-    .then(r => r.json())
+async function initAds() {
+    try {
+        await loadAdsgram();
+        const userId = tg.initDataUnsafe?.user?.id?.toString() || "12345";
+        
+        adController = window.Adsgram.init({
+            blockId: "22095", 
+            userId: userId,
+            debug: true 
+        });
+        console.log("Adsgram готов");
+    } catch (e) {
+        console.error("Ошибка инициализации рекламы:", e);
+    }
+}
+
+initAds();
+
+document.getElementById("unlockBtn").onclick = async function() {
+    if (!adController) {
+        alert("Реклама еще загружается или произошла ошибка. Попробуйте позже.");
+        return;
+    }
+
+    adController.show()
+        .then((result) => {
+            // ВАЖНО: Проверяем свойство done
+            if (result.done) {
+                alert("Реклама полностью просмотрена!");
+                document.getElementById("extendedResult").classList.remove("hidden");
+                document.getElementById("extendedText").innerText = "Твой результат готов!";
+            } else {
+                alert("Вы закрыли рекламу слишком рано.");
+            }
+        })
+        .catch((err) => {
+            // Обработка отсутствия рекламы (No Fill) или ошибок сети
+            console.error(err);
+            alert("Реклама сейчас недоступна: " + (err.description || "Ошибка сети"));
+        });
+};    .then(r => r.json())
     .then(json => {
         alert("Вопросы загружены!");
         window.quizData = json;
